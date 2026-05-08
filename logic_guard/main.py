@@ -12,6 +12,7 @@ def parse_arguments():
     parser.add_argument("-t", "--target", help="The target API URL")
     parser.add_argument("-k", "--token", help="The JWT Authorization token")
     parser.add_argument("-u", "--userid", help="User ID for IDOR testing")
+    parser.add_argument("-m", "--memory", help="Path to a memory image (.img, .raw) to extract data from")
     parser.add_argument("--stealth", action="store_true", help="Reduces concurrency")
     return parser.parse_args()
 
@@ -23,6 +24,7 @@ def main():
         target=args.target,
         token=args.token,
         userid=args.userid,
+        memory_path=args.memory,
         stealth=args.stealth
     )
     

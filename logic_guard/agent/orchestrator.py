@@ -8,9 +8,10 @@ from logic_guard.modules.passive import analyze_jwt_locally, scan_for_env_files
 from logic_guard.modules.active_logic import assess_business_logic
 
 class AgentOrchestrator:
-    def __init__(self, target, token, userid, stealth):
+    def __init__(self, target, token, userid, stealth, memory_path=None):
         self.target = validate_url(target) if target else None
         self.token = validate_token(token) if token else None
+        self.memory_path = memory_path
         self.userid = userid or "100"
         self.stealth = stealth
         self.reporter = InvestigativeReporter()
@@ -21,8 +22,12 @@ class AgentOrchestrator:
         logger.info(" LOGIC GUARD ELITE: AGENTIC REASONING ENGINE")
         logger.info("="*60)
         
+        # Step 0: Forensic Memory Pivot
+        if self.memory_path:
+            self._step_memory_forensics()
+
         if not self.target:
-            logger.error("[X] NO TARGET: Provide a target URL via -t")
+            logger.error("[X] NO TARGET: Provide a target URL via -t or provide -m for memory extraction.")
             return
 
         # Reason & Execute Step 1
@@ -34,15 +39,31 @@ class AgentOrchestrator:
         # Final Narrative Generation
         self.reporter.generate_final_narrative(self.findings)
 
+    def _step_memory_forensics(self):
+        from logic_guard.modules.memory import extract_api_data_from_memory
+        logger.info("\n[ANALYSIS] Reasoning: No target provided, but memory dump detected. Analyzing RAM for traces of Evil...")
+        mem_data = extract_api_data_from_memory(self.memory_path)
+        
+        if mem_data:
+            if mem_data["tokens"] and not self.token:
+                self.token = validate_token(mem_data["tokens"][0])
+                logger.info(f"[REASONING] SELF-CORRECTION: Successfully extracted JWT from memory. Using token for audit.")
+            
+            if mem_data["urls"] and not self.target:
+                self.target = validate_url(mem_data["urls"][0])
+                logger.info(f"[REASONING] SELF-CORRECTION: Successfully discovered API URL in memory: {self.target}")
+            
+            self.findings.append({"type": "MemoryForensics", "data": mem_data})
+
     def _step_passive_discovery(self):
-        logger.info("\n[🕵️] Reasoning: Initializing Passive Discovery Phase...")
+        logger.info("\n[ANALYSIS] Reasoning: Initializing Passive Discovery Phase...")
         if self.token:
             results = analyze_jwt_locally(self.token)
             self.findings.append({"type": "Passive", "data": results})
         scan_for_env_files(self.target)
 
     def _step_access_control(self):
-        logger.info("\n[🧠] Reasoning: Analyzing Access Control for IDOR/Bypass...")
+        logger.info("\n[REASONING] Reasoning: Analyzing Access Control for IDOR/Bypass...")
         
         attempts = 0
         max_attempts = 2

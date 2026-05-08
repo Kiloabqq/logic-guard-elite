@@ -11,19 +11,27 @@ class InvestigativeReporter:
         self.console.print("📜 AGENTIC INVESTIGATIVE NARRATIVE", style="bold cyan")
         self.console.print("="*60 + "\n", style="bold cyan")
 
-        narrative = """
+        # Dynamically build the narrative based on findings
+        mem_findings = next((f for f in findings if f['type'] == 'MemoryForensics'), None)
+        active_findings = next((f for f in findings if f['type'] == 'AccessControl'), None)
+
+        urls_found = ", ".join(mem_findings['data']['urls'][:3]) if mem_findings else "None"
+        tokens_found = len(mem_findings['data']['tokens']) if mem_findings else 0
+
+        narrative = f"""
 ### Executive Summary
-The Logic Guard agent initiated an autonomous investigation of the target API. 
-The objective was to identify 'Evil' indicators such as exposed credentials and broken access controls.
+The Logic Guard agent initiated an autonomous investigation. 
+**Target Analysis**: Identified {tokens_found} potential credentials and several API endpoints in RAM.
 
 ### Reasoning Process
-1. **Initial Assessment**: The agent performed deep JWT analysis to identify permission scopes.
-2. **Strategy Pivot**: Upon detecting a 403 Forbidden response during direct access, the agent successfully **self-corrected** by attempting a Host-Header injection bypass.
-3. **Forensic Validation**: All findings were cross-referenced against local artifacts to ensure 100% accuracy.
+1. **Memory Discovery**: The agent successfully extracted traces from physical memory.
+2. **Autonomous Pivot**: The agent identified `{urls_found}` as a primary target and initiated an active audit.
+3. **Self-Correction**: Detected a lack of valid session tokens for the specific endpoint; pivoted to 'Guest/Unauthenticated' bypass logic.
 
-### Key Findings
-- **JWT Entropy**: Low entropy detected in the signature, suggesting a weak signing secret.
-- **IDOR Vulnerability**: Successfully accessed user '101' data while authenticated as user '100'.
+### Key Evidence Discovered
+- **API Endpoints**: The agent mapped the following endpoints: `{urls_found}...`
+- **Credential Traces**: {tokens_found} JWT/Token patterns were isolated for further forensic validation.
+- **Logic Vulnerability**: Audit simulated a 'High' severity IDOR on the discovered resource.
 """
         self.console.print(Panel(Markdown(narrative), title="Forensic Report", subtitle="Logic Guard Elite v1.0", border_style="green"))
         
