@@ -1,0 +1,39 @@
+import argparse
+import os
+import sys
+from logic_guard.agent.orchestrator import AgentOrchestrator
+from logic_guard.core.logger import logger
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Logic Guard Elite - Agentic API IR Framework",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument("-t", "--target", help="The target API URL")
+    parser.add_argument("-k", "--token", help="The JWT Authorization token")
+    parser.add_argument("-u", "--userid", help="User ID for IDOR testing")
+    parser.add_argument("--stealth", action="store_true", help="Reduces concurrency")
+    return parser.parse_args()
+
+def main():
+    args = parse_arguments()
+    
+    # Initialize the Agentic Orchestrator
+    orchestrator = AgentOrchestrator(
+        target=args.target,
+        token=args.token,
+        userid=args.userid,
+        stealth=args.stealth
+    )
+    
+    try:
+        orchestrator.run_investigation()
+    except KeyboardInterrupt:
+        logger.error("\n[X] Investigation halted by user.")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"[X] Critical System Failure: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
