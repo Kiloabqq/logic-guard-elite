@@ -92,5 +92,19 @@ Full reasoning chains are stored in `logs/agent_trace.json`. These logs show the
 
 ---
 
+## 🛠️ Environment Stability & Troubleshooting
+
+### SIFT Compatibility Note
+When moving code between Windows and Linux (SIFT), hidden **BOM (Byte Order Mark)** characters or **Null Bytes** can occasionally be introduced by the host OS, causing Python `SyntaxError` (e.g., `source code string cannot contain null bytes`).
+
+**Quick Fix for SIFT**:
+If you encounter encoding issues on your workstation, run the following sanitization command in the project root:
+```bash
+find . -name "*.py" -exec sed -i 's/\x0//g' {} +
+```
+This ensures all source files are 100% clean, standard UTF-8 for the Linux kernel.
+
+---
+
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
