@@ -30,14 +30,39 @@ class AgentOrchestrator:
             logger.error("[X] NO TARGET: Provide a target URL via -t or provide -m for memory extraction.")
             return
 
-        # Reason & Execute Step 1
+        # Step 1: Recon & Discovery
+        self._step_discovery_recon()
+
+        # Step 2: Passive Analysis
         self._step_passive_discovery()
+
+        # Step 3: Cryptographic Fuzzing
+        self._step_cryptographic_audit()
         
-        # Reason & Execute Step 2 (with Self-Correction Demo)
+        # Step 4: Active Logic & IDOR
         self._step_access_control()
+
+        # Step 5: Volumetric Stress Test
+        self._step_stress_audit()
         
         # Final Narrative Generation
         self.reporter.generate_final_narrative(self.findings)
+
+    def _step_discovery_recon(self):
+        from logic_guard.modules.discovery import DiscoveryEngine
+        discovery = DiscoveryEngine(self.target)
+        discovery.run_recon()
+
+    def _step_cryptographic_audit(self):
+        if self.token:
+            from logic_guard.modules.crypto import CryptoFuzzer
+            crypto = CryptoFuzzer(self.token)
+            crypto.audit_jwt_strength()
+
+    def _step_stress_audit(self):
+        from logic_guard.modules.stress import StressAuditor
+        stress = StressAuditor(self.target, self.stealth)
+        stress.run_volumetric_test()
 
     def _step_memory_forensics(self):
         from logic_guard.modules.memory import extract_api_data_from_memory
