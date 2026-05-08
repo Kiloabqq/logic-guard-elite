@@ -8,7 +8,7 @@ class InvestigativeReporter:
 
     def generate_final_narrative(self, findings):
         self.console.print("\n" + "="*60, style="bold cyan")
-        self.console.print("📜 AGENTIC INVESTIGATIVE NARRATIVE", style="bold cyan")
+        self.console.print("INVESTIGATIVE NARRATIVE (AGENTIC REASONING)", style="bold cyan")
         self.console.print("="*60 + "\n", style="bold cyan")
 
         # Dynamically build the narrative based on findings
