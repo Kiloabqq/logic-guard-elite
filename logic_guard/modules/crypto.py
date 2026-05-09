@@ -14,6 +14,11 @@ class CryptoFuzzer:
         
         logger.inf("Auditing JWT Cryptographic Strength...")
         try:
+            # Check if it's actually a JWT
+            if len(self.token.split('.')) != 3:
+                logger.info("[-] Token is not a JWT. Skipping cryptographic strength audit.")
+                return "SKIPPED"
+
             header = jwt.get_unverified_header(self.token)
             logger.inf(f"Detected Algorithm: {header.get('alg')}")
             

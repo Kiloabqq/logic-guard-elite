@@ -20,7 +20,7 @@ class StressAuditor:
             iterations = 10
 
         success_count = 0
-        logger.inf(f"Simulating high-concurrency burst of {iterations} requests...")
+        logger.inf(f"Executing high-concurrency burst of {iterations} requests...")
         for i in range(iterations):
             try:
                 # Simulating high-concurrency burst

@@ -6,11 +6,10 @@ setup(
     packages=find_packages(),
     install_requires=[
         "requests",
-        "python-dotenv",
+        "pyjwt",
+        "typer",
         "colorama",
         "rich",
-        "anthropic",
-        "langchain",
     ],
     entry_points={
         "console_scripts": [

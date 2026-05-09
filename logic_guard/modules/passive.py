@@ -5,6 +5,10 @@ from logic_guard.core.logger import logger
 def analyze_jwt_locally(token):
     try:
         parts = token.split('.')
+        if len(parts) != 3:
+            logger.info("[-] Token is not a JWT. Skipping local cryptographic analysis.")
+            return None
+            
         header = json.loads(base64.b64decode(parts[0] + '==').decode('utf-8'))
         payload = json.loads(base64.b64decode(parts[1] + '==').decode('utf-8'))
         

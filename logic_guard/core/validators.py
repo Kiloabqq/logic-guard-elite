@@ -13,7 +13,4 @@ def validate_token(token):
         return None
     if token.lower().startswith("bearer "):
         token = token[7:].strip()
-    parts = token.split('.')
-    if len(parts) != 3:
-        return None
     return token

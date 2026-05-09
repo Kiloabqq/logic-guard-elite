@@ -18,6 +18,12 @@ class InvestigativeReporter:
         urls_found = ", ".join(mem_findings['data']['urls'][:3]) if mem_findings else (target if target else "None")
         tokens_count = len(mem_findings['data']['tokens']) if mem_findings else (1 if token else 0)
 
+        # Logic Vulnerability Logic
+        vulnerability_text = "No active logic flaws confirmed during this iteration."
+        if active_findings and active_findings.get('data'):
+            vuln = active_findings['data']
+            vulnerability_text = f"REAL {vuln['severity']} Severity {vuln['vulnerability']} found at {vuln['endpoint']}. Evidence: {vuln['leakage'][:50]}..."
+
         narrative = f"""
 ### Executive Summary
 The Logic Guard agent initiated an autonomous investigation. 
@@ -31,7 +37,7 @@ The Logic Guard agent initiated an autonomous investigation.
 ### Key Evidence Discovered
 - **API Endpoints**: The agent mapped the following endpoints: `{urls_found}...`
 - **Credential Traces**: {tokens_count} JWT/Token patterns were isolated for further forensic validation.
-- **Logic Vulnerability**: Audit simulated a 'High' severity IDOR on the discovered resource.
+- **Logic Vulnerability**: {vulnerability_text}
 """
         self.console.print(Panel(Markdown(narrative), title="Forensic Report", subtitle="Logic Guard Elite v1.0", border_style="green"))
         

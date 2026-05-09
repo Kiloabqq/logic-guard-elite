@@ -11,7 +11,8 @@ def parse_arguments():
         allow_abbrev=False
     )
     parser.add_argument("-t", "--target", help="The target API URL")
-    parser.add_argument("-k", "--token", help="The JWT Authorization token")
+    parser.add_argument("-k", "--token", help="The JWT or API Key")
+    parser.add_argument("-s", "--secret", help="The Secret Key (if available)")
     parser.add_argument("-u", "--userid", help="User ID for IDOR testing")
     parser.add_argument("-m", "--memory", help="Path to a memory image (.img, .raw) to extract data from")
     parser.add_argument("--stealth", action="store_true", help="Reduces concurrency")
@@ -25,6 +26,7 @@ def main():
     orchestrator = AgentOrchestrator(
         target=args.target,
         token=args.token,
+        secret=args.secret,
         userid=args.userid,
         memory_path=args.memory,
         stealth=args.stealth,

@@ -9,9 +9,10 @@ from logic_guard.modules.passive import analyze_jwt_locally, scan_for_env_files
 from logic_guard.modules.active_logic import assess_business_logic
 
 class AgentOrchestrator:
-    def __init__(self, target, token, userid, stealth, memory_path=None, verbose=False):
+    def __init__(self, target, token, userid, stealth, secret=None, memory_path=None, verbose=False):
         self.target = validate_url(target) if target else None
         self.token = validate_token(token) if token else None
+        self.secret = secret
         self.memory_path = memory_path
         self.userid = userid or "100"
         self.stealth = stealth
@@ -104,22 +105,22 @@ class AgentOrchestrator:
         while attempts < max_attempts and not success:
             logger.info(f"[*] Attempting Logic Audit (Try {attempts + 1})...")
             
-            # Simulate a failure for the first try to demonstrate "Self-Correction"
-            if attempts == 0 and not self.token:
-                logger.warning("[!] SELF-CORRECTION: Detected missing token. Reasoning: Attempting guest bypass...")
-                # In a real agent, it would modify its strategy here
-                attempts += 1
-                continue
-            
             # Real execution
-            results = assess_business_logic(self.target, self.token, self.userid)
-            self.findings.append({"type": "AccessControl", "data": results})
-            success = True
+            results = assess_business_logic(self.target, self.token, self.userid, secret=self.secret)
+            if results:
+                self.findings.append({"type": "AccessControl", "data": results})
+                success = True
+            
+            if not success:
+                logger.warn("[!] SELF-CORRECTION: Pivot required. Attempting Guest bypass...")
+                self.token = None
+                self.secret = None
+            
+            attempts += 1
             
         if not success:
             logger.error("[X] ALL REASONING PATHS EXHAUSTED for Access Control.")
 
     def log_agent_trace(self, action, reasoning, outcome):
-        # This fulfills the "Agent Execution Logs" requirement
         trace = f"ACTION: {action} | REASONING: {reasoning} | OUTCOME: {outcome}"
         logger.debug(trace)
