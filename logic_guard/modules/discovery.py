@@ -13,7 +13,7 @@ class DiscoveryEngine:
         ]
 
     def run_recon(self):
-        logger.info(f"[*] Starting Discovery Scan on {self.target}...")
+        logger.inf(f"Starting Discovery Scan on {self.target}...")
         findings = []
         
         for path in self.common_paths:
@@ -24,10 +24,10 @@ class DiscoveryEngine:
                 resp = requests.get(url, headers=headers, timeout=3)
                 
                 if resp.status_code == 200:
-                    logger.info(f"[+] DISCOVERED: {url} (200 OK)")
+                    logger.success(f"DISCOVERED: {url} (200 OK)")
                     findings.append(url)
                 elif resp.status_code == 403:
-                    logger.warning(f"[!] FORBIDDEN: {url} (403) - Potential protected asset.")
+                    logger.warn(f"FORBIDDEN: {url} (403) - Potential protected asset.")
             except Exception:
                 pass
                 

@@ -11,7 +11,8 @@ def extract_api_data_from_memory(filepath):
         logger.error(f"[X] Memory file not found: {filepath}")
         return None
 
-    logger.info(f"[*] Analyzing Memory Image: {os.path.basename(filepath)}...")
+    logger.inf(f"Analyzing Memory Image: {os.path.basename(filepath)}...")
+    logger.inf("Scanning binary blobs for JWT patterns and API endpoints...")
     
     # Patterns
     jwt_pattern = re.compile(rb'eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+')
@@ -33,14 +34,14 @@ def extract_api_data_from_memory(filepath):
                     token = match.decode('utf-8', errors='ignore')
                     if token not in findings["tokens"]:
                         findings["tokens"].append(token)
-                        logger.info(f"[+] Found JWT in Memory: {token[:20]}...")
+                        logger.success(f"[+] Found JWT in Memory: {token[:20]}...")
 
                 # Find API Endpoints
                 for match in url_pattern.findall(chunk):
                     url = match.decode('utf-8', errors='ignore')
                     if url not in findings["urls"]:
                         findings["urls"].append(url)
-                        logger.info(f"[+] Found API Endpoint in Memory: {url}")
+                        logger.success(f"Found API Endpoint: {url}")
                 
                 # Move back slightly to catch patterns split across chunks
                 if f.tell() < os.path.getsize(filepath):

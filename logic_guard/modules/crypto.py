@@ -12,22 +12,23 @@ class CryptoFuzzer:
         if not self.token:
             return None
         
-        logger.info("[*] Auditing JWT Cryptographic Strength...")
+        logger.inf("Auditing JWT Cryptographic Strength...")
         try:
             header = jwt.get_unverified_header(self.token)
-            logger.info(f"[+] Found Algorithm: {header.get('alg')}")
+            logger.inf(f"Detected Algorithm: {header.get('alg')}")
             
             if header.get('alg') == 'none':
-                logger.warning("[!] CRITICAL: JWT 'none' algorithm bypass detected!")
+                logger.warn("CRITICAL VULNERABILITY: JWT 'none' algorithm bypass detected!")
                 return "CRITICAL"
             
             if 'kid' in header:
-                logger.info(f"[+] Found Key ID (KID): {header['kid']}")
+                logger.inf(f"Detected Key ID (KID): {header['kid']}")
                 # Simulate KID path traversal test
                 if "../" in header['kid']:
-                    logger.warning("[!] VULNERABILITY: Potential KID Path Traversal detected.")
+                    logger.warn("VULNERABILITY FOUND: Potential KID Path Traversal detected.")
                     return "HIGH"
                     
+            logger.success("Cryptographic integrity check complete. No obvious bypasses found.")
             return "SECURE"
         except Exception as e:
             logger.error(f"[X] Crypto Audit Error: {e}")

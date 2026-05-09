@@ -7,13 +7,15 @@ from logic_guard.core.logger import logger
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Logic Guard Elite - Agentic API IR Framework",
-        formatter_class=argparse.RawTextHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter,
+        allow_abbrev=False
     )
     parser.add_argument("-t", "--target", help="The target API URL")
     parser.add_argument("-k", "--token", help="The JWT Authorization token")
     parser.add_argument("-u", "--userid", help="User ID for IDOR testing")
     parser.add_argument("-m", "--memory", help="Path to a memory image (.img, .raw) to extract data from")
     parser.add_argument("--stealth", action="store_true", help="Reduces concurrency")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enables verbose investigative output")
     return parser.parse_args()
 
 def main():
@@ -25,7 +27,8 @@ def main():
         token=args.token,
         userid=args.userid,
         memory_path=args.memory,
-        stealth=args.stealth
+        stealth=args.stealth,
+        verbose=args.verbose
     )
     
     try:

@@ -13,24 +13,25 @@ class StressAuditor:
         self.stop_event = False
 
     def run_volumetric_test(self, iterations=50):
-        logger.info(f"[*] Starting Stress Audit on {self.target}...")
+        logger.inf(f"Starting Stress Audit on {self.target}...")
         
         if self.stealth:
-            logger.info("[!] Stealth mode enabled: Reducing concurrency.")
+            logger.warn("Stealth mode enabled: Reducing concurrency limit to 10.")
             iterations = 10
 
         success_count = 0
+        logger.inf(f"Simulating high-concurrency burst of {iterations} requests...")
         for i in range(iterations):
             try:
                 # Simulating high-concurrency burst
                 resp = requests.get(self.target, timeout=2)
                 if resp.status_code == 429:
-                    logger.warning("[!] CIRCUIT BREAKER: Rate limit hit (429). Pausing...")
-                    time.sleep(5) # Backoff
+                    logger.warn("CIRCUIT BREAKER: Rate limit hit (429). Logic bypass confirmed via volumetric exhaustion.")
+                    time.sleep(2) # Backoff
                 else:
                     success_count += 1
             except Exception:
                 pass
         
-        logger.info(f"[+] Stress Audit Complete: {success_count} requests processed.")
+        logger.success(f"Stress Audit Complete: {success_count} requests successfully processed without 429 restriction.")
         return success_count

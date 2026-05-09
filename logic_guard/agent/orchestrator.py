@@ -1,4 +1,5 @@
 import time
+import os
 from logic_guard.core.logger import logger
 from logic_guard.core.validators import validate_url, validate_token
 from logic_guard.agent.reporter import InvestigativeReporter
@@ -8,45 +9,51 @@ from logic_guard.modules.passive import analyze_jwt_locally, scan_for_env_files
 from logic_guard.modules.active_logic import assess_business_logic
 
 class AgentOrchestrator:
-    def __init__(self, target, token, userid, stealth, memory_path=None):
+    def __init__(self, target, token, userid, stealth, memory_path=None, verbose=False):
         self.target = validate_url(target) if target else None
         self.token = validate_token(token) if token else None
         self.memory_path = memory_path
         self.userid = userid or "100"
         self.stealth = stealth
+        self.verbose = verbose
         self.reporter = InvestigativeReporter()
         self.findings = []
         
     def run_investigation(self):
-        logger.info("="*60)
-        logger.info(" LOGIC GUARD ELITE: AGENTIC REASONING ENGINE")
-        logger.info("="*60)
+        logger.inf("="*60)
+        logger.inf(" LOGIC GUARD ELITE: AGENTIC REASONING ENGINE")
+        logger.inf("="*60)
         
         # Step 0: Forensic Memory Pivot
         if self.memory_path:
+            logger.inf(f"🔍 STEP 0: Initiating Forensic Pivot from RAM: {os.path.basename(self.memory_path)}")
             self._step_memory_forensics()
+        else:
+            logger.warn("⚠️  Skipping Step 0: No Memory Artifact provided. Using manual input targets.")
 
         if not self.target:
             logger.error("[X] NO TARGET: Provide a target URL via -t or provide -m for memory extraction.")
             return
 
-        # Step 1: Recon & Discovery
+        # Step 1: Recon & Target Discovery
+        logger.inf("🌐 STEP 1: Discovering API Footprint and Hidden Assets...")
         self._step_discovery_recon()
 
-        # Step 2: Passive Analysis
+        # Step 2: JWT/Session Analysis
+        logger.inf("🔐 STEP 2: Analyzing Session Tokens and Cryptographic Integrity...")
         self._step_passive_discovery()
-
-        # Step 3: Cryptographic Fuzzing
         self._step_cryptographic_audit()
-        
-        # Step 4: Active Logic & IDOR
+
+        # Step 3: Business Logic & IDOR Audit
+        logger.inf("🧠 STEP 3: Executing Agentic Logic Audit (IDOR/Bypass Checks)...")
         self._step_access_control()
 
-        # Step 5: Volumetric Stress Test
+        # Step 4: Stress/Concurrency Audit
+        logger.inf("⚡ STEP 4: Stress Testing Concurrent Execution Limits...")
         self._step_stress_audit()
         
         # Final Narrative Generation
-        self.reporter.generate_final_narrative(self.findings)
+        self.reporter.generate_final_narrative(self.findings, self.target, self.token)
 
     def _step_discovery_recon(self):
         from logic_guard.modules.discovery import DiscoveryEngine
